@@ -11,6 +11,6 @@ const twitterClient = new TwitterClient({
 });
 
 // Schedule tasks to tweet every 1am the lowest price of electricity in Spain
-cron.schedule("0 1 * * *", function () {
+cron.schedule("0 0 * * *", function () {
     getPrices(twitterClient);
 });
