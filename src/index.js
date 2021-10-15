@@ -1,6 +1,7 @@
 const { TwitterClient } = require("twitter-api-client");
 const cron = require("node-cron");
-const { getPrices } = require("./functions/functions");
+const { tweetPrices } = require("./functions/functions");
+const { getPricePerHour } = require("./api/api");
 require("dotenv").config();
 
 const twitterClient = new TwitterClient({
@@ -10,7 +11,13 @@ const twitterClient = new TwitterClient({
     accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
-// Schedule tasks to tweet every 1am the lowest price of electricity in Spain
-cron.schedule("0 0 * * *", function () {
-    getPrices(twitterClient);
+// Schedule task to tweet at 8pm the lowest prices of electricity in Spain
+cron.schedule("0 15 * * *", async () => {
+    const pricePerHour = await getPricePerHour();
+    if (!pricePerHour) {
+        console.error("Error al leer datos de electricidad");
+        return;
+    }
+
+    tweetPrices(twitterClient, pricePerHour);
 });
