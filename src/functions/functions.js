@@ -6,11 +6,7 @@ const QuickChart = require("quickchart-js");
 
 const sortByPrice = (objs) => {
     return [...objs.PVPC].sort((a, b) =>
-        parseFloat(a.PCB) > parseFloat(b.PCB)
-            ? 1
-            : parseFloat(b.PCB) > parseFloat(a.PCB)
-            ? -1
-            : 0
+        a.PCB > b.PCB ? 1 : b.PCB > a.PCB ? -1 : 0
     );
 };
 
