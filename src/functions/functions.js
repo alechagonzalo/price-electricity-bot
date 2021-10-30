@@ -5,9 +5,8 @@ const { mapperDataAMToDataVM } = require("./mapper");
 const QuickChart = require("quickchart-js");
 
 const sortByPrice = (objs) => {
-    return [...objs.PVPC].sort((a, b) =>
-        a.PCB > b.PCB ? 1 : b.PCB > a.PCB ? -1 : 0
-    );
+    const obj = [...objs.PVPC].map((p) => parseFloat(p.PCB.replace(",", ".")));
+    return obj.sort((a, b) => (a > b ? 1 : b > a ? -1 : 0));
 };
 
 const generatePricesText = (prices) => {
