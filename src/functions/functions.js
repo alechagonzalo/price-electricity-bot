@@ -5,12 +5,14 @@ const { mapperDataAMToDataVM } = require("./mapper");
 const QuickChart = require("quickchart-js");
 
 const sortByPrice = (objs) => {
-    const obj = [...objs.PVPC].map((p) => parseFloat(p.PCB.replace(",", ".")));
-    return obj.sort((a, b) => (a > b ? 1 : b > a ? -1 : 0));
+    return objs.sort((a, b) =>
+        a.price > b.price ? 1 : b.price > a.price ? -1 : 0
+    );
 };
 
 const generatePricesText = (prices) => {
-    const sortedByPrice = mapperDataAMToDataVM(sortByPrice(prices));
+    const sortedByPrice = sortByPrice(mapperDataAMToDataVM(prices.PVPC));
+
     let text = `Horas mas baratas  ${prices.PVPC[0].Dia}:`;
     sortedByPrice.forEach((h, i) => {
         if (i < 7) text += `\n${i + 1}. ${h.hour} hs. €${h.price} MW/h`;
@@ -20,14 +22,14 @@ const generatePricesText = (prices) => {
 };
 
 const generatePricesChart = async (prices) => {
-    const mappedPrices = mapperDataAMToDataVM(prices);
+    const mappedPrices = mapperDataAMToDataVM(prices.PVPC);
 
     const labels = [];
     const data = [];
 
     mappedPrices.forEach((p) => {
         labels.push(`${p.hour}`);
-        data.push(p.price.replace(",", "."));
+        data.push(p.price);
     });
 
     const myChart = new QuickChart();
@@ -49,7 +51,7 @@ const generatePricesChart = async (prices) => {
 const tweetPrices = async (twitterClient, prices) => {
     try {
         const textTweet = generatePricesText(prices);
-        const imgBase64 = await generatePricesChart(prices.PVPC);
+        const imgBase64 = await generatePricesChart(prices);
         const media = await twitterClient.media.mediaUpload({
             media_data: imgBase64
         });
